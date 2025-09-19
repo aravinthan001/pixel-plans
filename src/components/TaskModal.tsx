@@ -1,42 +1,41 @@
-import { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { 
-  CalendarIcon, 
-  Paperclip, 
-  Plus, 
-  X, 
+  Calendar as CalendarIcon,
+  X,
+  Plus,
+  Upload,
+  Paperclip,
   MessageSquare,
+  Activity,
+  AlertCircle,
+  CheckCircle2,
   Clock,
-  User
+  User,
+  ListTodo,
+  Link2,
+  GitBranch
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Task } from '@/types';
+import { Task, Comment, Subtask, Attachment } from '@/types';
 import { mockUsers } from '@/lib/mockData';
 import { toast } from 'sonner';
+import CommentSection from './CommentSection';
+import SubtaskList from './SubtaskList';
+import FileUpload from './FileUpload';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -54,6 +53,27 @@ export default function TaskModal({ isOpen, onClose, task, projectId }: TaskModa
   const [assignees, setAssignees] = useState(task?.assignees || []);
   const [tags, setTags] = useState(task?.tags || []);
   const [newTag, setNewTag] = useState('');
+  const [comments, setComments] = useState<Comment[]>(task?.comments || []);
+  const [subtasks, setSubtasks] = useState<Subtask[]>(task?.subtasks || []);
+  const [attachments, setAttachments] = useState<Attachment[]>(task?.attachments || []);
+  const [estimatedHours, setEstimatedHours] = useState(0);
+  const [dependencies, setDependencies] = useState<string[]>([]);
+
+  // Update state when task prop changes
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title);
+      setDescription(task.description || '');
+      setStatus(task.status);
+      setPriority(task.priority);
+      setDueDate(task.dueDate);
+      setAssignees(task.assignees);
+      setTags(task.tags);
+      setComments(task.comments || []);
+      setSubtasks(task.subtasks || []);
+      setAttachments(task.attachments || []);
+    }
+  }, [task]);
 
   const handleSave = () => {
     if (!title.trim()) {

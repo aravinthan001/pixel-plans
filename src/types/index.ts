@@ -54,6 +54,7 @@ export interface Comment {
   taskId: string;
   mentions?: User[];
   createdAt: Date;
+  editedAt?: Date;
 }
 
 export interface Attachment {
@@ -80,4 +81,25 @@ export interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
   token: string | null;
+}
+
+export interface Settings {
+  theme: 'light' | 'dark' | 'system';
+  notifications: {
+    email: boolean;
+    push: boolean;
+    taskUpdates: boolean;
+    mentions: boolean;
+    projectInvites: boolean;
+  };
+  language: string;
+  timezone: string;
+}
+
+export interface TeamMember extends User {
+  department?: string;
+  location?: string;
+  phone?: string;
+  lastActive?: Date;
+  projects: string[];
 }
